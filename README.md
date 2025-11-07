@@ -58,4 +58,3 @@ If you'd like, I can:
 
 
 
-By Hamid Gujjar
