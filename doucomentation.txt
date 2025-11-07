@@ -1,0 +1,186 @@
+AI Video Automation 
+=====================================================
+
+AI Video Automation — Quick User Guide (non-technical)
+
+Overview
+--------
+This small toolkit processes audio and video files and outputs a final merged video. The code is written in Python but you don't need to be a programmer to use the pre-built runner `app.py` in the `my_new_project` folder.
+
+What this package does (simple)
+- Enhances audio (volume, fade, speed, normalize) — by default it works in-memory so intermediate files are not created.
+- Enhances video (color adjust, trim, fade, watermark, subtitles) — default is in-memory processing.
+- Merges intro + main videos or combines a video and audio track.
+- Only the final file is saved by the top-level runner / when you pick "Save" — this avoids clutter from intermediate files.
+
+Where the files live
+- Project root: the folder where you opened this guide.
+- Input files: provide your audio/video files anywhere on disk; the app will ask for their paths.
+- Output folders used by the project (created automatically when needed):
+	- `enhanced_audio/` — audio outputs (if you explicitly save audio operations)
+	- `enhanced_videos/` — intermediate or saved video outputs
+	- `merged_videos/` — merged video outputs
+	- `output_videos/` — final outputs saved by the top-level runner
+	- `my_new_project/test_outputs/` — smoke test outputs (created when you run the test script)
+
+How to run (Windows, PowerShell)
+--------------------------------
+1) Open PowerShell and activate the project's virtual environment (if you created one). Example if using the provided `.venv`:
+
+```powershell
+& C:/Users/ASUS/OneDrive/Desktop/aivideoautomation/.venv/Scripts/Activate.ps1
+```
+
+2) From the project root run the interactive app (this will open a simple text menu):
+
+```powershell
+python .\my_new_project\app.py
+```
+
+3) Follow the on-screen menu:
+- Choose audio or video options to apply enhancements.
+- You can select "Merge Video + Audio" to attach an audio track to a video.
+- Choose "Full Pipeline" to run a common sequence: intro + main merge, apply audio, then save the final video.
+- When asked whether to save intermediate artifacts, choose 'no' if you want only the final file.
+
+Running the smoke test (automated quick check)
+-------------------------------------------
+There is a smoke test that generates tiny (1 second) audio and video files, exercises all code paths (both in-memory and save=true), and writes outputs to `my_new_project/test_outputs/`.
+
+Run it with:
+
+```powershell
+python .\my_new_project\tests\test.py
+```
+
+After running, check `my_new_project/test_outputs/` for these test files. The test prints a short pass/fail summary.
+
+If you prefer a single-step run that executes the full pipeline programmatically
+---------------------------------------------------------------------------
+You can run the interactive runner's `Full Pipeline` option from the menu or create a small script that imports the package. Example (PowerShell):
+
+```powershell
+python -c "from src import VideoProcessingApp; app=VideoProcessingApp(); app.run()"
+```
+
+Common issues & troubleshooting (non-technical)
+----------------------------------------------
+- "I ran the app and nothing happened": Make sure you are running PowerShell in the project folder and that Python is installed. If you get an error about missing packages, install them (see below).
+- "Text on video is blank or fails": The video text feature relies on ImageMagick. If you need text overlays and see errors, install ImageMagick and make sure its binaries are in your PATH.
+- "Audio/video not found": When the app asks for a path, you must type or paste the full path to your file (e.g., C:\Users\You\Videos\clip.mp4). Relative paths work if they're from the project root.
+- "File already open / locked": Close any program currently playing or editing the target file (e.g., video player) before running the pipeline.
+
+Installing dependencies
+-----------------------
+If required packages are missing, install them into your active environment. A `requirment.txt` is provided in the project root. From PowerShell with your environment active, run:
+
+```powershell
+pip install -r requirment.txt
+```
+
+Key external requirements
+- ImageMagick: required for text overlays (MoviePy TextClip). Install from https://imagemagick.org and ensure `magick` is in PATH on Windows.
+
+Where to look for results
+-------------------------
+After you choose to save the final video, the runner prints the path where it saved the output. By default saved final videos are placed in `output_videos/`.
+
+If you ever need to list the files created by a run, open PowerShell and run:
+
+```powershell
+Get-ChildItem -Recurse -File output_videos,merged_videos,enhanced_videos,my_new_project\test_outputs
+```
+
+Extra notes for advanced users (brief)
+- Code is implemented so operations default to in-memory objects (arrays and MoviePy Clip objects). Each function accepts save=True to write an output file if you want to persist intermediate steps.
+- The top-level runner (`my_new_project\app.py`) intentionally writes only the final output to reduce clutter.
+
+Support & next steps
+--------------------
+If you want:
+- A one-click installer or packaged exe for Windows, say so and I can add instructions or a small wrapper script using PyInstaller.
+- A GUI instead of the console menu, say so and I can scaffold a simple Tkinter/Flask/Electron UI.
+
+Contact / developer notes
+- The code expects Python 3.8+ and uses common audio/video libraries (MoviePy, librosa, Pillow, numpy, soundfile). See `requirment.txt` for the full list.
+- If you share the file paths you want to process, I can give step-by-step commands tailored to your files.
+
+Thank you — enjoy creating videos!
+
+1) What this does (plain language)
+----------------------------------
+- Takes an input video (example: assist\video.mp4).
+- Reduces the audio volume of the input music, adjusts the video's color (brightness/contrast/saturation).
+- Joins an intro + main video if present, attaches the processed audio, and writes one final MP4 file (final_output.mp4).
+
+2) Files and where outputs appear
+---------------------------------
+- Input folder (place your files here): my_new_project\assist
+	- Example audio: groovy-vibe-427121.mp3
+	- Example video: video.mp4
+- Final output (written once by the pipeline): my_new_project\output_videos\final_output.mp4
+
+3) Requirements (what you need installed)
+----------------------------------------
+- Python (recommended) — an executable is already available in this project at:
+	C:\Users\ASUS\OneDrive\Desktop\aivideoautomation\.venv\Scripts\python.exe (if you use the included virtual environment).
+- Required Python libraries are listed in my_new_project\requirment.txt and can be installed with pip.
+- ImageMagick (only needed if the project uses text rendering on videos). Install from https://imagemagick.org and choose 'Add to PATH'.
+
+4) One-click install (PowerShell) — uses the project's virtualenv python
+-------------------------------------------------------------------
+Open PowerShell and run these commands from the project root (copy/paste each line):
+
+```powershell
+# Install Python packages into the project's venv (uses the bundled python if present)
+C:/Users/ASUS/OneDrive/Desktop/aivideoautomation/.venv/Scripts/python.exe -m pip install -r .\my_new_project\requirment.txt
+
+# Run the in-memory pipeline script (it will write only the final video)
+C:/Users/ASUS/OneDrive/Desktop/aivideoautomation/.venv/Scripts/python.exe .\my_new_project\src\__init__.py
+```
+
+If you don't have the project's virtualenv, use your system's python:
+
+```powershell
+# System Python (if installed)
+python -m pip install -r .\my_new_project\requirment.txt
+python .\my_new_project\src\__init__.py
+```
+
+5) How to change which files are processed
+-----------------------------------------
+- Open the file `my_new_project\src\__init__.py` with Notepad (or any text editor).
+- Look for the two variables near the top of the `run_pipeline()` function:
+	- `audio_src` — set this to the path of your audio (mp3/wav).
+	- `video_src` — set this to the path of your video (mp4).
+- Save the file and re-run the command from step 4 to produce a new final video.
+
+6) Quick explanation of "no intermediate files"
+-----------------------------------------------
+The pipeline has been adjusted so that intermediate steps (color-adjusted video, trimmed audio) are done in memory by default. Only one final MP4 is written. If you want to save intermediate files for debugging, you can edit small 'save' flags in the code, but this is not required for normal use.
+
+7) Troubleshooting — common problems
+------------------------------------
+- "Module not found" errors when running:
+	- Make sure you installed requirements from `requirment.txt` using the python command above.
+- "TextClip" related errors / no text on video:
+	- Install ImageMagick and add it to your PATH.
+- File not found errors:
+	- Make sure the input files are present under `my_new_project\assist` or update the paths in `src\__init__.py`.
+- OneDrive or permission issues:
+	- If saving fails, try copying the project to a simple path such as `C:\Projects\aivideoautomation` and run from there.
+
+8) If you want help
+-------------------
+- Tell me which OS and which of the commands above you ran.
+- If you prefer, supply the exact input filenames you want processed and I can prepare a ready-to-run copy of `src\__init__.py` that points to them.
+
+9) Notes for power-users (optional)
+----------------------------------
+- You can change processing options (brightness, contrast, volume adjustment) by editing `my_new_project\src\__init__.py` — the parameters are readable and clearly labeled.
+- If you need a single-click packaged executable (so users don't install Python), I can help create a Windows executable (requires extra packaging steps).
+
+That's it — follow steps 4 and 5 to run. If anything fails, paste the console output and I'll guide you through the fix.
+
+-- End of document
+
