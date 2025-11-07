@@ -55,3 +55,7 @@ pip install -r requirment.txt
 If you'd like, I can:
 - Create a one-line PowerShell helper to activate venv, install deps, and launch the app.
 - Expand this into a longer `README.md` with screenshots and examples.
+
+
+
+By Hamid Gujjar
